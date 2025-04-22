@@ -6,6 +6,14 @@
     echo template("templates/partials/header.php");
     echo template("templates/partials/nav.php");
 
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete']) && isset($_POST['students'])) {
+        foreach ($_POST['students'] as $id) {
+            $id = mysqli_real_escape_string($conn, $id);
+            mysqli_query($conn, "DELETE FROM student WHERE studentid = '$id'");
+        }
+        echo "<p style='color: green;'>Selected students have been deleted.</p>";
+    }
+
     // Fetch student records
     $sql = "SELECT studentid, firstname, lastname, dob, house, town, county, country, postcode FROM student";
     $result = mysqli_query($conn, $sql);
@@ -35,12 +43,19 @@
             text-align: center;
         }
     </style>
+    <script>
+        function confirmDeletion() {
+            return confirm("Are you sure you want to delete the selected students?");
+        }
+    </script>
 </head>
 <body>
     <h2>Student Records</h2>
+    <form method="post" onsubmit="return confirmDeletion();">
     <table>
         <thead>
             <tr>
+                <th></th> <!-- For checkbox -->
                 <th>Student ID</th>
                 <th>First Name</th>
                 <th>Last Name</th>
@@ -55,6 +70,9 @@
         <tbody>
             <?php foreach ($students as $student): ?>
                 <tr>
+                    <td class="center">
+                        <input type="checkbox" name="students[]" value="<?= htmlspecialchars($student['studentid']) ?>">
+                    </td>
                     <td><?= htmlspecialchars($student['studentid']) ?></td>
                     <td><?= htmlspecialchars($student['firstname']) ?></td>
                     <td><?= htmlspecialchars($student['lastname']) ?></td>
@@ -69,5 +87,7 @@
         </tbody>
     </table>
     <br>
+    <input type="submit" name="delete" value="Delete Selected" style="padding: 10px 20px; background-color: red; color: white; border: none;">
+    </form>
 </body>
 </html>
