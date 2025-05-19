@@ -1,3 +1,7 @@
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
 <?php
     include("_includes/config.inc");
     include("_includes/dbconnect.inc");
@@ -11,11 +15,11 @@
             $id = mysqli_real_escape_string($conn, $id);
             mysqli_query($conn, "DELETE FROM student WHERE studentid = '$id'");
         }
-        echo "<p style='color: green;'>Selected students have been deleted.</p>";
+        echo "<p class='text-green-500'>Selected students have been deleted.</p>";
     }
 
-    // Fetch student records
-    $sql = "SELECT studentid, firstname, lastname, dob, house, town, county, country, postcode FROM student";
+    // Fetch student records from database
+    $sql = "SELECT studentid, firstname, lastname, dob, house, town, county, country, postcode, profileimg FROM student";
     $result = mysqli_query($conn, $sql);
     $students = mysqli_fetch_all($result, MYSQLI_ASSOC);
 ?>
@@ -26,68 +30,67 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Records</title>
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .center {
-            text-align: center;
-        }
-    </style>
     <script>
         function confirmDeletion() {
             return confirm("Are you sure you want to delete the selected students?");
         }
     </script>
 </head>
-<body>
-    <h2>Student Records</h2>
-    <form method="post" onsubmit="return confirmDeletion();">
-    <table>
-        <thead>
-            <tr>
-                <th></th> <!-- For checkbox -->
-                <th>Student ID</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Date of Birth</th>
-                <th>House</th>
-                <th>Town</th>
-                <th>County</th>
-                <th>Country</th>
-                <th>Postcode</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($students as $student): ?>
-                <tr>
-                    <td class="center">
-                        <input type="checkbox" name="students[]" value="<?= htmlspecialchars($student['studentid']) ?>">
-                    </td>
-                    <td><?= htmlspecialchars($student['studentid']) ?></td>
-                    <td><?= htmlspecialchars($student['firstname']) ?></td>
-                    <td><?= htmlspecialchars($student['lastname']) ?></td>
-                    <td><?= htmlspecialchars($student['dob']) ?></td>
-                    <td><?= htmlspecialchars($student['house']) ?></td>
-                    <td><?= htmlspecialchars($student['town']) ?></td>
-                    <td><?= htmlspecialchars($student['county']) ?></td>
-                    <td><?= htmlspecialchars($student['country']) ?></td>
-                    <td><?= htmlspecialchars($student['postcode']) ?></td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
-    <br>
-    <input type="submit" name="delete" value="Delete Selected" style="padding: 10px 20px; background-color: red; color: white; border: none;">
-    </form>
+<body class="bg-gray-100">
+    <div class="max-w-7xl mx-auto px-4 py-6">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Student Records</h2>
+        <!-- students form -->
+        <form method="post" onsubmit="return confirmDeletion();" class="bg-white shadow-md rounded-lg p-6">
+            <table class="min-w-full table-auto">
+                <thead>
+                    <tr class="bg-gray-200">
+                        <th class="px-4 py-2 text-left"> <input type="checkbox" class="select-all-checkbox"> </th>
+                        <th class="px-4 py-2">Image</th>
+                        <th class="px-4 py-2">Student ID</th>
+                        <th class="px-4 py-2">First Name</th>
+                        <th class="px-4 py-2">Last Name</th>
+                        <th class="px-4 py-2">Date of Birth</th>
+                        <th class="px-4 py-2">House</th>
+                        <th class="px-4 py-2">Town</th>
+                        <th class="px-4 py-2">County</th>
+                        <th class="px-4 py-2">Country</th>
+                        <th class="px-4 py-2">Postcode</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- loops through the students and displays their details -->
+                    <?php foreach ($students as $student): ?>
+                        <tr class="border-b">
+                            <td class="px-4 py-2">
+                                <!-- checkbox for selecting records -->
+                                <input type="checkbox" name="students[]" value="<?= htmlspecialchars($student['studentid']) ?>" class="student-checkbox">
+                            </td>
+                            <td class="px-4 py-2">
+                                <?php if (!empty($student['profileimg'])): ?>
+                                    <img src="<?= htmlspecialchars($student['profileimg']) ?>" width="60" height="60" class="object-cover rounded-full">
+                                <?php else: ?>
+                                    <span>No image</span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="px-4 py-2"><?= htmlspecialchars($student['studentid']) ?></td>
+                            <td class="px-4 py-2"><?= htmlspecialchars($student['firstname']) ?></td>
+                            <td class="px-4 py-2"><?= htmlspecialchars($student['lastname']) ?></td>
+                            <td class="px-4 py-2"><?= htmlspecialchars($student['dob']) ?></td>
+                            <td class="px-4 py-2"><?= htmlspecialchars($student['house']) ?></td>
+                            <td class="px-4 py-2"><?= htmlspecialchars($student['town']) ?></td>
+                            <td class="px-4 py-2"><?= htmlspecialchars($student['county']) ?></td>
+                            <td class="px-4 py-2"><?= htmlspecialchars($student['country']) ?></td>
+                            <td class="px-4 py-2"><?= htmlspecialchars($student['postcode']) ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+
+            <div class="mt-4 flex justify-between items-center">
+                <!-- submit button to delete selexted students -->
+                <button type="submit" name="delete" class="bg-red-500 hover:bg-red-700 text-white py-2 px-4 rounded-md">Delete Selected</button>
+            </div>
+        </form>
+    </div>
 </body>
 </html>
